@@ -92,7 +92,7 @@ python contagem.py
 
 ---
 
-## ➕ Adicionar evento
+##  Adicionar evento
 
 Informe:
 
