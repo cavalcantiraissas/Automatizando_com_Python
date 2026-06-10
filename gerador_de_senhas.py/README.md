@@ -46,11 +46,6 @@ O projeto foi desenvolvido como parte de estudos do livro *Automatize Tarefas Ch
 ##  Como clonar e executar
 
 ### 1. Clonar o repositório
-
-```bash
-git clone https://github.com/cavalcantiraissas/Automatizando_com_Python.git
-cd Automatizando_com_Python
-```
  
 ### 2. Criar um ambiente virtual
 
