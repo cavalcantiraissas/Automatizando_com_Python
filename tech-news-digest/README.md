@@ -20,10 +20,7 @@ Profissionais de tecnologia precisam acompanhar inovações, novas ferramentas e
 - (Opcional) Chaves gratuitas da NewsAPI e/ou Google Gemini
 
 ### 1. Clone ou baixe os arquivos
-```bash
-git clone https://github.com/cavalcantiraissas//tech-news-digest.git
-cd tech-news-digest
-```
+
 ### 2. Crie e ative um ambiente virtual
 ```bash
 python -m venv venv
