@@ -23,4 +23,4 @@ Este projeto leva essa filosofia à prática. Cada script aqui representa um peq
 -  Evoluir continuamente – novos scripts serão adicionados regularmente.
 
 ---
-✨ Novos scripts chegam em breve. Volte sempre ou dê um star para acompanhar as atualizações!
+Novos scripts chegam em breve. Volte sempre ou dê um star para acompanhar as atualizações!
