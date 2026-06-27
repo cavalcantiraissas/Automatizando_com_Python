@@ -10,7 +10,7 @@ Este repositório é uma coleção contínua de projetos de automação desenvol
 
 A ideia central nasceu da leitura de *Automate the Boring Stuff with Python*, de Al Sweigart. O livro mostra algo simples e poderoso: computadores são excelentes em repetição, mas só agem corretamente quando bem instruídos. Se uma tarefa precisa ser feita duas, dez ou cem vezes, por que não ensinar a máquina a fazê-la sozinha?
 
-Este projeto leva essa filosofia à prática. Cada script aqui representa um pequeno ganho de produtividade – e, somados, eles transformam a maneira como lidamos com arquivos, planilhas, e-mails, sites e processos administrativos.
+Este projeto leva essa filosofia à prática. Cada script aqui representa um pequeno ganho de produtividade e, somados, eles transformam a maneira como lidamos com arquivos, planilhas, e-mails, sites e processos administrativos.
 
 ---
 
