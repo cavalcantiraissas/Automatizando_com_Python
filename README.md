@@ -1,6 +1,6 @@
 #  Automatizando com Python
 
-**Scripts, ferramentas e automações para resolver problemas reais do dia a dia**
+**Scripts, ferramentas e automações para resolver problemas reais do dia a dia.**
 
 Este repositório é uma coleção contínua de projetos de automação desenvolvidos em Python. Cada script foi criado para eliminar tarefas repetitivas, reduzir erros manuais e liberar tempo para o que realmente importa: pensar, criar e decidir.
 
