@@ -1,187 +1,95 @@
-# Ferramenta de Automação de E-mails
+# Automação de e-mails
 
-Aplicação Python em linha de comando que automatiza o envio de e-mails, rastreia o histórico de envios e simplifica a seleção de contatos com base na frequência de uso. Ideal para usuários que enviam conteúdos repetitivos para múltiplos destinatários.
+**Envio de e-mails pelo terminal via SMTP, com seleção rápida dos contatos mais usados, envio para vários destinatários, histórico com data e hora e reenvio da última mensagem.**
 
-## Propósito
+[![Python](https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![SMTP](https://img.shields.io/badge/smtplib-STARTTLS-EA4335?logo=gmail&logoColor=white)](https://docs.python.org/3/library/smtplib.html)
+[![dotenv](https://img.shields.io/badge/python--dotenv-.env-ECD53F)](.env.example)
+[![Coleção](https://img.shields.io/badge/cole%C3%A7%C3%A3o-Automatizando_com_Python-6f42c1)](../)
 
-Esta ferramenta elimina a necessidade de digitar manualmente os endereços de e-mail a cada envio. Ela memoriza os endereços já utilizados, conta quantas vezes cada um foi usado e oferece um menu de seleção rápida.
+Para quem manda o mesmo tipo de mensagem com frequência: o programa memoriza os endereços já usados, conta quantas vezes cada um recebeu e-mail e oferece os mais frequentes num menu numerado, sem precisar redigitá-los.
 
-Além disso, registra cada e-mail enviado com data e hora e permite reenviar a última mensagem para novos destinatários sem redigitar o assunto e o corpo.
+---
 
-## Tecnologias e Ferramentas
+## Sumário
 
-* **Python 3** - Linguagem de programação principal
-* **smtplib** - Envio de e-mails via SMTP
-* **email.mime** - Construção de mensagens compatíveis com MIME
-* **python-dotenv** - Carregamento seguro de credenciais a partir de um arquivo `.env`
-* **datetime** - Registro de data e hora dos envios
-* **Arquivos de texto** - Persistência da frequência de contatos e do histórico de envios
+- [Destaques](#destaques)
+- [Como funciona](#como-funciona)
+- [Como executar](#como-executar)
+- [Uso](#uso)
+- [Estrutura do projeto](#estrutura-do-projeto)
+- [Limitações](#limitações)
 
-## Funcionalidades
+---
 
-* **Gerenciamento seguro de credenciais** - E-mail e senha armazenados em arquivo `.env` (utilize uma Senha de App do Gmail)
-* **Registro de frequência de contatos** - Cada destinatário é salvo em `email_counts.txt` com sua contagem de uso
-* **Seleção inteligente de destinatários** - Contatos mais usados são exibidos com a quantidade de envios para seleção rápida
-* **Múltiplos destinatários** - Envie o mesmo e-mail para vários endereços de uma só vez, digitando ou selecionando da lista
-* **Entrada flexível da mensagem**
+## Destaques
 
-  * Digite o corpo do e-mail interativamente (finalize com `FIM` em uma nova linha)
-  * Ou carregue o conteúdo a partir de um arquivo de texto
-* **Histórico de envios** - Cada e-mail enviado é registrado em `historico_envios.txt` com data, destinatário(s) e assunto
-* **Reenvio do último e-mail** - Reutilize o assunto e o corpo do e-mail mais recente para novos destinatários sem redigitar
-* **Menu interativo** –-Escolha entre enviar novo e-mail, listar histórico, reenviar o último e-mail ou sair
+- **Contatos frequentes:** os 5 endereços mais usados aparecem numerados, com a quantidade de envios.
+- **Vários destinatários:** digitados separados por vírgula ou escolhidos por índice (`1,3,5`).
+- **Corpo flexível:** digitado no terminal (termina com `FIM`) ou lido de um arquivo de texto.
+- **Histórico:** cada envio é registrado com data, hora, destinatário e assunto.
+- **Reenvio:** o último assunto e corpo podem ser reaproveitados para novos destinatários.
+- **Credenciais fora do código:** lidas de um `.env` local, que não é versionado.
 
-## Como Executar
+## Como funciona
 
-### Pré-requisitos
-
-* Python 3.6 ou superior instalado
-* Uma conta de e-mail com suporte a SMTP (Gmail, Outlook, etc.)
-* Para Gmail:
-
-  * Ative a Verificação em Duas Etapas
-  * Crie uma Senha de App
-
-### Instalação
-
-1. Clone ou baixe os arquivos do projeto para um diretório:
-
-   * `main.py` – Programa principal
-   * `.env` – Arquivo de configuração (criar manualmente)
-   * `email_counts.txt` – Criado automaticamente na primeira execução
-   * `historico_envios.txt` – Criado automaticamente na primeira execução
-
-2. Instale a dependência necessária:
-
-```bash
-pip install python-dotenv
+```mermaid
+flowchart LR
+    E[(.env<br/>EMAIL, PASSWORD,<br/>SMTP_SERVER, SMTP_PORT)] --> M[main.py]
+    C[(email_counts.txt<br/>envios por endereço)] <--> M
+    M -->|STARTTLS + login| S[Servidor SMTP]
+    S --> D[Destinatários]
+    M -->|após envio bem-sucedido| H[(historico_envios.txt)]
 ```
 
-3. Crie um arquivo `.env` no mesmo diretório com o seguinte conteúdo:
+A mensagem é montada com `MIMEMultipart` em texto puro UTF-8 e enviada por `smtplib` com `STARTTLS`. Só depois de um envio bem-sucedido o programa incrementa a contagem de cada destinatário e grava o histórico, de modo que falhas de autenticação ou rede não poluem os registros.
 
-```env
-EMAIL=seuemail@gmail.com
-PASSWORD=sua_senha_de_app
-SMTP_SERVER=smtp.gmail.com
-SMTP_PORT=587
-```
-
-Substitua:
-
-* `seuemail@gmail.com` pelo seu endereço de e-mail
-* `sua_senha_de_app` pela Senha de App gerada pelo Gmail
-
-Caso utilize outro provedor, ajuste `SMTP_SERVER` e `SMTP_PORT` conforme necessário.
-
-### Execução
-
-No terminal, navegue até o diretório do projeto e execute:
+## Como executar
 
 ```bash
-python main.py
-```
-
-Ou, em sistemas Linux/macOS:
-
-```bash
+cd Automacao-emails
+pip install -r requirements.txt
+cp .env.example .env      # Windows: copy .env.example .env
 python3 main.py
 ```
 
-## Guia de Uso
+Preencha o `.env` com o seu endereço e uma [senha de app do Gmail](https://myaccount.google.com/apppasswords) (exige verificação em duas etapas; o Gmail não aceita a senha da conta por SMTP). Para outro provedor, ajuste `SMTP_SERVER` e `SMTP_PORT`. Sem `EMAIL` e `PASSWORD`, o programa avisa e encerra.
 
-1. O programa exibe o e-mail remetente configurado.
-2. Se não houver contatos registrados, será solicitado um destinatário manualmente.
-3. Após o primeiro envio, o endereço é armazenado e sua contagem de uso é incrementada.
-4. Nas execuções seguintes, os contatos mais frequentes aparecem numerados.
-
-### Seleção de Destinatários
-
-Você pode:
-
-* Digitar o número correspondente para selecionar um contato
-* Digitar `0` para informar um novo e-mail
-* Digitar `99` para enviar para múltiplos destinatários:
-
-  * Informando e-mails separados por vírgula
-  * Ou selecionando vários índices
-
-### Composição da Mensagem
-
-1. Informe o assunto do e-mail.
-2. Escolha como fornecer o corpo da mensagem:
-
-#### Opção 1 – Digitação Interativa
-
-Digite o texto linha por linha e finalize com:
+## Uso
 
 ```text
-FIM
+1 - Enviar novo e-mail
+2 - Listar histórico de envios
+3 - Reenviar o último e-mail para novo(s) destinatário(s)
+4 - Sair
 ```
 
-em uma linha separada.
+Na escolha de destinatários, digite o número de um contato frequente, `0` para um endereço novo ou `99` para vários. No corpo, a opção 1 lê linhas até uma linha contendo só `FIM`; a opção 2 lê um arquivo `.txt`.
 
-#### Opção 2 – Carregar de Arquivo
+Exemplo de `historico_envios.txt`:
 
-Informe o caminho completo de um arquivo `.txt` contendo o conteúdo do e-mail.
+```text
+04/11/2026 09:15:02 | ana@exemplo.com | Relatório semanal
+04/11/2026 09:15:02 | bia@exemplo.com | Relatório semanal
+```
 
-### Após o Envio
+## Estrutura do projeto
 
-O programa:
+| Arquivo | Descrição |
+|---|---|
+| `main.py` | Menu, seleção de destinatários, montagem e envio da mensagem |
+| `.env.example` | Modelo das credenciais; copie para `.env` |
+| `requirements.txt` | Dependência externa (`python-dotenv`) |
+| `email_counts.txt` | Gerado no uso: contagem de envios por endereço |
+| `historico_envios.txt` | Gerado no uso: registro de cada envio |
 
-* Envia a mensagem
-* Atualiza a frequência dos contatos
-* Registra o envio no histórico
+## Limitações
 
-### Menu Principal
+- O "último e-mail" fica só na memória: ao fechar o programa, a opção 3 não tem o que reenviar.
+- Apenas texto puro, sem anexos nem HTML.
+- Os endereços não são validados; um endereço inválido só é detectado pelo servidor SMTP.
+- Os arquivos de dados são gravados no diretório atual, por isso o programa deve ser executado de dentro da pasta.
 
-Após cada operação, será exibido o menu:
+---
 
-| Opção | Descrição                  |
-| ----- | -------------------------- |
-| 1     | Enviar novo e-mail         |
-| 2     | Listar histórico de envios |
-| 3     | Reenviar último e-mail     |
-| 4     | Sair do programa           |
-
-## Estrutura dos Arquivos
-
-| Arquivo                | Finalidade                                                          |
-| ---------------------- | ------------------------------------------------------------------- |
-| `.env`                 | Armazena credenciais e configurações SMTP (não deve ser versionado) |
-| `email_counts.txt`     | Armazena contatos e quantidade de utilização (`email\|quantidade`)  |
-| `historico_envios.txt` | Registra data, hora, destinatários e assunto dos envios             |
-| `main.py`              | Script principal da aplicação                                       |
-
-## Solução de Problemas
-
-### Erros de Autenticação
-
-Se estiver utilizando Gmail:
-
-* Verifique se a Verificação em Duas Etapas está ativada
-* Utilize uma Senha de App
-
-Desde 2022, o Gmail não aceita login SMTP com senha comum.
-
-### E-mail Não Enviado
-
-Verifique:
-
-* Sua conexão com a internet
-* O servidor SMTP configurado
-* A porta SMTP utilizada
-
-### O Comando `FIM` Não Encerra a Digitação
-
-Certifique-se de que:
-
-* `FIM` está sozinho em uma linha
-* Não há espaços antes ou depois do texto
-
-### Histórico Não Registrado
-
-Verifique se o programa possui permissão de escrita no diretório do projeto.
-
-## Licença
-
-Este projeto é open source e está disponível sob a licença MIT.
+[← Automatizando com Python](../)
