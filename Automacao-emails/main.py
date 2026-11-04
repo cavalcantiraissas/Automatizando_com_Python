@@ -9,7 +9,7 @@ load_dotenv()
 
 EMAIL = os.getenv('EMAIL')
 PASSWORD = os.getenv('PASSWORD')
-SMTP_SERVER = os.getenv('SMTP_SERVER')
+SMTP_SERVER = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
 SMTP_PORT = int(os.getenv('SMTP_PORT', 587))
 
 ARQUIVO_CONTAGENS = 'email_counts.txt'
@@ -169,17 +169,17 @@ def enviar_novo_email(contagens):
     destinatarios = obter_destinatarios(contagens)
     if not destinatarios:
         print("Nenhum destinatário informado. Operação cancelada.")
-        return
+        return contagens
 
     assunto = input("Assunto do e-mail: ").strip()
     if not assunto:
         print("Assunto não pode ser vazio.")
-        return
+        return contagens
 
     corpo = obter_corpo()
     if not corpo.strip():
         print("Corpo do e-mail não pode ser vazio.")
-        return
+        return contagens
 
     # Guarda o último e-mail para possível reenvio
     ULTIMO_EMAIL['assunto'] = assunto
@@ -228,6 +228,9 @@ def exibir_menu():
 
 def main():
     print("=== ENVIO AUTOMÁTICO DE E-MAILS ===\n")
+    if not EMAIL or not PASSWORD:
+        print("Credenciais não encontradas. Copie .env.example para .env e preencha EMAIL e PASSWORD.")
+        return
     print(f"Remetente configurado: {EMAIL}\n")
 
     contagens = carregar_contagens()
