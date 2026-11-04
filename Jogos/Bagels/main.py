@@ -45,7 +45,8 @@ class JogoBagels:
         
         while True:
             nome = input("\nDigite seu nome de usuário: ").strip()
-            if nome:
+            # A vírgula separa os campos em usuarios_bagels.txt
+            if nome and ',' not in nome:
                 if nome in self.usuarios:
                     print(f"\nBem-vindo de volta, {nome}!")
                     self.usuario_atual = nome
@@ -54,7 +55,7 @@ class JogoBagels:
                     print(f"\nUsuário '{nome}' não encontrado. Vou criar uma nova conta para você!")
                     return self.criar_usuario(nome)
             else:
-                print("Nome de usuário inválido. Tente novamente.")
+                print("Nome de usuário inválido (não pode ser vazio nem conter vírgula). Tente novamente.")
     
     def gerar_numero_secreto(self):
         """Gera um número secreto de 3 dígitos sem repetição"""
