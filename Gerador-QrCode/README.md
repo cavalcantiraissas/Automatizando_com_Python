@@ -1,166 +1,56 @@
-#  Gerador de QR Code em Python
+# Gerador de QR Code
 
-Um programa desenvolvido em Python que permite gerar QR Codes a partir de links (URLs) informados pelo usuário diretamente pelo terminal.
+**Converte um link digitado no terminal em QR Code e salva a imagem `.png` com o nome escolhido.**
 
-O QR Code gerado é salvo automaticamente como uma imagem no formato `.png` dentro da pasta do projeto.
+[![Python](https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![qrcode](https://img.shields.io/badge/qrcode-Pillow-555555)](https://pypi.org/project/qrcode/)
+[![Coleção](https://img.shields.io/badge/cole%C3%A7%C3%A3o-Automatizando_com_Python-6f42c1)](../)
 
----
-
-##  Objetivo
-
-O objetivo deste projeto é facilitar a criação de QR Codes de maneira rápida e prática através de uma interface de linha de comando (CLI).
-
-O usuário informa:
-
-- O link que deseja converter em QR Code;
-- O nome do arquivo de saída;
-
-O programa realiza a validação dos dados, cria a imagem do QR Code e salva o arquivo no diretório atual do projeto.
+Um jeito rápido de gerar QR Codes para cartazes, apresentações ou cartões, sem depender de sites de terceiros.
 
 ---
 
-##  Funcionalidades
+## Destaques
 
--  Conversão de URLs em QR Code;
--  Geração de imagens no formato `.png`;
--  Definição personalizada do nome do arquivo;
--  Tratamento de caracteres inválidos em nomes de arquivos;
--  Possibilidade de gerar vários QR Codes em uma única execução;
--  Compatível com Windows, Linux e macOS.
+- **Nome de arquivo seguro:** os caracteres `< > : " / \ | ? *`, inválidos no Windows, viram `_`.
+- **Vários códigos por execução:** ao fim de cada geração, o programa pergunta se deve gerar outro.
+- **Tamanho automático:** `QRCode(version=1, ...)` com `make(fit=True)` cresce a versão conforme o tamanho do link.
 
----
+## Como funciona
 
-##  Tecnologias e Ferramentas Utilizadas
+O link é codificado com correção de erro nível L (até 7% de recuperação), módulos de 10 px e borda de 4 módulos, o mínimo da especificação. A imagem é gerada em preto e branco e salva no diretório atual.
 
-- **Python 3**
-- **qrcode** – Biblioteca responsável pela criação dos QR Codes;
-- **Pillow (PIL)** – Biblioteca utilizada para manipulação e salvamento de imagens;
-- **os** – Módulo nativo do Python utilizado para manipulação de caminhos e diretórios.
-
----
-
-##  Estrutura do Projeto
-
-```text
-gerador-qrcode/
-│
-├── main.py             # Código principal do programa
-├── README.md           # Documentação do projeto
-```
-
----
-
-##  Pré-requisitos
-
-Antes de executar o projeto, é necessário possuir:
-
-- Python 3 instalado na máquina;
-- Gerenciador de pacotes `pip`.
-
-Para verificar a instalação, execute:
+## Como executar
 
 ```bash
-python --version
-```
-
-ou:
-
-```bash
-python3 --version
-```
-
----
-
-##  Instalação das Dependências
-
-1. Clone o repositório
-
-2. Acesse a pasta do projeto
-
-3. Instale as bibliotecas necessárias:
-
-```bash
-pip install qrcode[pil] pillow
-```
-
----
-
-##  Como Executar o Programa
-
-###  Windows
-
-No Prompt de Comando (CMD) ou PowerShell:
-
-```powershell
-python main.py
-```
-
----
-
-###  Linux
-
-No terminal:
-
-```bash
+cd Gerador-QrCode
+pip install -r requirements.txt
 python3 main.py
 ```
-
----
-
-###  macOS
-
-No Terminal:
-
-```bash
-python3 main.py
-```
-
----
-
-##  Exemplo de Utilização
 
 ```text
 === GERADOR DE QR CODE ===
 
-Digite o link (URL) que deseja converter em QR Code:
-https://github.com
+Digite o link (URL) que deseja converter em QR Code: https://github.com
+Digite o título para o arquivo (sem extensão): meu-qrcode
 
-Digite o título para o arquivo (sem extensão):
-meu-qrcode
-
-QR Code gerado com sucesso!
-
-Arquivo salvo em:
-C:\Projetos\gerador-qrcode\meu-qrcode.png
-
-Link:
-https://github.com
+ QR Code gerado com sucesso!
+ Arquivo salvo em: /caminho/para/Gerador-QrCode/meu-qrcode.png
+ Link: https://github.com
 ```
 
+## Estrutura do projeto
+
+| Arquivo | Descrição |
+|---|---|
+| `main.py` | Leitura do link e do nome, geração e gravação da imagem |
+| `requirements.txt` | Dependência externa (`qrcode[pil]`) |
+
+## Limitações
+
+- O texto não é validado como URL; qualquer texto vira QR Code.
+- Um arquivo com o mesmo nome é sobrescrito sem aviso.
+
 ---
 
-##  Tratamento de Erros
-
-O programa realiza algumas validações para garantir uma melhor experiência de uso:
-
-- Impede a geração de QR Codes sem uma URL informada;
-- Impede a criação de arquivos sem nome;
-- Substitui caracteres inválidos no nome do arquivo por `_`;
-- Captura possíveis erros durante o processo de geração da imagem.
-
----
-
-##  Fluxo de Funcionamento
-
-1. O usuário informa uma URL;
-2. O usuário escolhe um nome para o arquivo;
-3. O sistema valida as entradas fornecidas;
-4. O QR Code é gerado utilizando a biblioteca `qrcode`;
-5. A imagem é salva em formato `.png`;
-6. O usuário pode optar por gerar um novo QR Code ou encerrar o programa.
-
-
-
-##  Licença
-
-Este projeto é de uso livre para fins de estudo e aprendizado.
+[← Automatizando com Python](../)
