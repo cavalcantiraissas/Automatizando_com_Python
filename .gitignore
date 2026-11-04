@@ -1,0 +1,18 @@
+# Credenciais locais (copie de .env.example)
+.env
+
+# Dados gerados pelos scripts durante o uso
+email_counts.txt
+historico_envios.txt
+eventos.txt
+senhas_criptografadas.txt
+usuarios_bagels.txt
+blackjack_users.txt
+ranking_jogo.txt
+Gerador-QrCode/*.png
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
