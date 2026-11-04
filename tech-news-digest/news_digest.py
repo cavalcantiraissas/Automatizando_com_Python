@@ -23,7 +23,8 @@ load_dotenv()
 # Estas variáveis DEVEM estar definidas no arquivo .env
 EMAIL_ORIGEM = os.getenv("EMAIL_ORIGEM")       # Seu e-mail Gmail
 EMAIL_DESTINO = os.getenv("EMAIL_DESTINO")     # Para quem enviar (pode ser o mesmo)
-SENHA_APP = os.getenv("GMAIL_APP_PASSWORD")    # Senha de aplicativo do Gmail (16 caracteres)
+# Senha de aplicativo do Gmail (16 caracteres); o Google a exibe com espaços, que são removidos
+SENHA_APP = (os.getenv("GMAIL_APP_PASSWORD") or "").replace(" ", "")
 
 # --- Configurações de notícias (opcionais) ---
 NEWS_API_KEY = os.getenv("NEWS_API_KEY")       # Chave da NewsAPI (gratuita)
@@ -43,7 +44,7 @@ USAR_IA = False          # Altere para True se tiver uma chave Gemini válida
 if USAR_IA and GEMINI_API_KEY:
     import google.generativeai as genai
     genai.configure(api_key=GEMINI_API_KEY)
-    modelo_ia = genai.GenerativeModel("gemini-1.5-flash")
+    modelo_ia = genai.GenerativeModel("gemini-2.5-flash")
     print(" IA Gemini ativada para gerar resumos!")
 else:
     USAR_IA = False
@@ -61,7 +62,11 @@ def buscar_noticias_rss():
     }
     for nome_fonte, url_feed in feeds_rss.items():
         try:
-            feed = feedparser.parse(url_feed)
+            # Baixa com requests (certificados do certifi) em vez de deixar o
+            # feedparser usar o urllib, que falha em silêncio quando o SSL não é verificado
+            resp = requests.get(url_feed, timeout=10)
+            resp.raise_for_status()
+            feed = feedparser.parse(resp.content)
             for entrada in feed.entries[:5]:   # 5 notícias por fonte
                 noticias.append({
                     "titulo": entrada.title,
@@ -96,13 +101,16 @@ def buscar_noticias_api():
             dados = resp.json()
             if dados["status"] == "ok":
                 for artigo in dados["articles"]:
+                    # A NewsAPI devolve artigos removidos com o título "[Removed]"
+                    if not artigo.get("title") or artigo["title"] == "[Removed]":
+                        continue
                     # Evita duplicatas simples (pelo título)
                     if not any(artigo["title"] == n["titulo"] for n in noticias):
                         noticias.append({
                             "titulo": artigo["title"],
                             "link": artigo["url"],
                             "fonte": artigo["source"]["name"],
-                            "descricao": artigo.get("description", "Sem descrição."),
+                            "descricao": artigo.get("description") or "Sem descrição.",
                             "data": artigo.get("publishedAt", datetime.now().strftime("%Y-%m-%d")),
                         })
         except Exception as e:
@@ -207,6 +215,10 @@ def enviar_email(assunto, corpo_html):
 
 # ================= FUNÇÃO PRINCIPAL =================
 def main():
+    if not (EMAIL_ORIGEM and EMAIL_DESTINO and SENHA_APP):
+        print(" Configure EMAIL_ORIGEM, EMAIL_DESTINO e GMAIL_APP_PASSWORD no arquivo .env (copie de .env.example).")
+        return
+
     print(" Iniciando coleta de notícias...")
     noticias = buscar_noticias_rss() + buscar_noticias_api()
     print(f" Total de notícias coletadas: {len(noticias)}")
@@ -223,8 +235,8 @@ def main():
     corpo_html = gerar_email_html(noticias)
     assunto = f" Seu Resumo de Tecnologia - {datetime.now().strftime('%d/%m/%Y')}"
     print(" Enviando e-mail...")
-    enviar_email(assunto, corpo_html)
-    print(" Processo finalizado!")
+    if enviar_email(assunto, corpo_html):
+        print(" Processo finalizado!")
 
 
 if __name__ == "__main__":
