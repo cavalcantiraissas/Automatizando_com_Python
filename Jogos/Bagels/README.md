@@ -1,196 +1,88 @@
-#  Jogo Bagels em Python
+# Bagels
 
-Um jogo de adivinhação baseado em lógica, desenvolvido em Python utilizando programação orientada a objetos (POO). O jogador deve descobrir um número secreto de 3 dígitos sem repetição, utilizando dicas fornecidas pelo sistema a cada tentativa.
+**Jogo de dedução lógica: descobrir um número secreto de 3 dígitos distintos em até 10 tentativas, guiado pelas dicas Fermi, Pico e Bagels, com contas de jogador e ranking.**
 
-Além da mecânica tradicional do Bagels, o projeto possui sistema de usuários, armazenamento de estatísticas e ranking de jogadores.
+[![Python](https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![POO](https://img.shields.io/badge/paradigma-orientado_a_objetos-555555)](#estrutura-do-projeto)
+[![Jogos](https://img.shields.io/badge/cole%C3%A7%C3%A3o-Jogos-6f42c1)](../)
 
----
-
-##  Objetivo do Projeto
-
-O objetivo deste projeto é implementar o clássico jogo **Bagels** utilizando conceitos fundamentais da programação, como:
-
-- Programação Orientada a Objetos (POO);
-- Manipulação de arquivos;
-- Estruturas de dados;
-- Controle de fluxo;
-- Validação de entradas;
-- Persistência de dados em arquivos locais.
-
-O jogador tem até **10 tentativas** para descobrir o número secreto gerado aleatoriamente pelo sistema.
+Implementação em Python do clássico jogo de adivinhação com dicas posicionais. Toda a lógica fica na classe `JogoBagels`, que também cuida das contas e das estatísticas de cada jogador.
 
 ---
 
-#  Como Funciona o Jogo
+## Sumário
 
-O programa gera um número secreto composto por **3 dígitos diferentes**.
+- [Regras](#regras)
+- [Destaques](#destaques)
+- [Como funciona](#como-funciona)
+- [Como executar](#como-executar)
+- [Estrutura do projeto](#estrutura-do-projeto)
+- [Limitações](#limitações)
 
-A cada tentativa, o jogador recebe dicas de acordo com o seu palpite:
+---
+
+## Regras
+
+O número secreto tem 3 dígitos diferentes e não começa com 0. A cada palpite (também com 3 dígitos diferentes), o jogo responde com uma dica por dígito acertado:
 
 | Dica | Significado |
-|------|-------------|
-| **Fermi** | Um dígito está correto e está na posição correta |
-| **Pico** | Um dígito está correto, mas está na posição errada |
-| **Bagels** | Nenhum dígito do palpite existe no número secreto |
+|---|---|
+| **Fermi** | Dígito certo na posição certa |
+| **Pico** | Dígito certo na posição errada |
+| **Bagels** | Nenhum dígito do palpite está no número |
 
-### Exemplo
+Com o número secreto `427` e o palpite `123`, a resposta é `Pico`: o `2` existe, mas em outra posição. As dicas saem com todos os Fermi primeiro e depois os Pico, de modo que a ordem não revela qual dígito gerou cada uma.
 
-Número secreto:
+## Destaques
 
-```text
-427
+- **Login simples:** um nome novo cria a conta automaticamente; um nome existente recupera as estatísticas.
+- **Ranking** com vitórias, derrotas, total de partidas e taxa de vitória.
+- **Palpites validados:** exatamente 3 dígitos, só números, sem repetição.
+- **Troca de usuário** sem sair do jogo.
+
+## Como funciona
+
+```mermaid
+flowchart LR
+    L[Login] --> M{Menu}
+    M -->|1| P[Partida<br/>até 10 palpites]
+    P -->|acertou| V[vitória +1]
+    P -->|10 erros| D[derrota +1]
+    V & D --> A[(usuarios_bagels.txt)]
+    M -->|2| R[Ranking]
+    M -->|3| I[Instruções]
+    M -->|4| L
 ```
 
-Palpite do jogador:
+O número secreto é sorteado embaralhando os dígitos de `0` a `9` e pegando os três primeiros; se o primeiro for `0`, ele troca de lugar com um dígito não nulo. As estatísticas são gravadas em `usuarios_bagels.txt`, uma linha `nome,vitórias,derrotas` por jogador, ao fim de cada partida.
 
-```text
-123
-```
-
-Resultado:
-
-```text
-Pico
-```
-
-Isso significa que o número **2** existe no número secreto, mas está na posição incorreta.
-
----
-
-##  Funcionalidades
-
--  Sistema de login e cadastro automático de jogadores;
--  Salvamento permanente de usuários em arquivo `.txt`;
--  Registro de vitórias e derrotas;
--  Sistema de ranking de jogadores;
--  Cálculo de taxa de vitória;
--  Geração aleatória de números secretos sem repetição;
--  Validação dos palpites inseridos;
--  Menu interativo com múltiplas opções;
--  Possibilidade de jogar diversas partidas em uma mesma execução;
--  Compatível com Windows, Linux e macOS.
-
----
-
-##  Tecnologias Utilizadas
-
-- **Python 3**
-- **random** - Geração aleatória do número secreto;
-- **os** - Manipulação de arquivos e verificação de existência de dados;
-- **Programação Orientada a Objetos (POO)**
-
----
-
-##  Estrutura do Projeto
-
-```text
-jogo-bagels/
-│
-├── main.py                  # Código principal do jogo
-└── README.md                # Documentação do projeto
-```
-
----
-
-##  Pré-requisitos
-
-Antes de executar o projeto, é necessário possuir:
-
-- Python 3 instalado na máquina.
-
-Verifique a instalação com:
+## Como executar
 
 ```bash
-python --version
-```
-
-ou:
-
-```bash
-python3 --version
-```
-
----
-
-##  Como Executar o Projeto
-
-1. Clone o repositório
-
-2. Entre na pasta do projeto
-
----
-
-###  Windows
-
-Abra o Prompt de Comando (CMD) ou PowerShell e execute:
-
-```powershell
-python main.py
-```
-
----
-
-###  Linux
-
-Abra o terminal e execute:
-
-```bash
+cd Jogos/Bagels
 python3 main.py
 ```
 
----
-
-###  macOS
-
-Abra o Terminal e execute:
-
-```bash
-python3 main.py
-```
-
----
-
-##  Menu Principal
-
-Ao iniciar o programa, o jogador terá acesso ao seguinte menu:
-
 ```text
-1. Iniciar nova partida
-2. Ver ranking
-3. Ver instruções
-4. Trocar usuário
-5. Sair do jogo
+1.  Iniciar nova partida
+2.  Ver ranking
+3.  Ver instruções
+4.  Trocar usuário
+5.  Sair do jogo
 ```
+
+## Estrutura do projeto
+
+| Arquivo | Descrição |
+|---|---|
+| `main.py` | Classe `JogoBagels`: contas, sorteio, dicas, partida e ranking |
+| `usuarios_bagels.txt` | Gerado no uso: estatísticas dos jogadores |
+
+## Limitações
+
+- O ranking ordena só pelo número de vitórias, sem desempate pela taxa.
+- Os nomes diferenciam maiúsculas de minúsculas (`Ana` e `ana` são contas distintas) e não podem conter vírgula, o separador do arquivo.
 
 ---
 
-##  Sistema de Dados
-
-As informações dos jogadores são armazenadas no arquivo:
-
-```text
-usuarios_bagels.txt
-```
-
-Cada registro contém:
-
-- Nome do jogador;
-- Quantidade de vitórias;
-- Quantidade de derrotas.
-
-Esses dados são carregados automaticamente sempre que o jogo é iniciado, permitindo que o progresso dos usuários seja mantido entre diferentes execuções.
-
----
-
-##  Fluxo de Funcionamento
-
-1. O jogador realiza o login informando seu nome;
-2. Caso o usuário não exista, uma nova conta é criada automaticamente;
-3. O sistema exibe o menu principal;
-4. Uma nova partida pode ser iniciada;
-5. O número secreto é gerado aleatoriamente;
-6. O jogador possui até 10 tentativas para acertar;
-7. As dicas Fermi, Pico ou Bagels são exibidas após cada palpite;
-8. O sistema atualiza as estatísticas de vitória ou derrota;
-9. O ranking dos jogadores pode ser consultado a qualquer momento.
-
+[← Jogos](../) · [Repositório principal](../../)
