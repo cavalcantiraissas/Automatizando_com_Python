@@ -152,8 +152,15 @@ class BlackJackGame:
         """Executa uma partida de BlackJack"""
         if not self.current_user or self.current_user['dinheiro'] <= 0:
             print("\n Você não tem dinheiro para jogar!")
-            return False
-        
+            return None, 0
+
+        # Abaixo da menor aposta possível (R$10) não há partida válida
+        if self.current_user['dinheiro'] < 10:
+            print(f"\n Seu saldo (R$ {self.current_user['dinheiro']:.2f}) é menor que a aposta mínima de R$ 10.00!")
+            print("Crie um novo usuário para jogar novamente!")
+            self.current_user = None
+            return None, 0
+
         # Mostrar menu de dificuldade
         print("\n" + "="*50)
         print(" NÍVEL DE DIFICULDADE")
@@ -167,6 +174,11 @@ class BlackJackGame:
             try:
                 dificuldade = int(input("Escolha a dificuldade (1-3): "))
                 if dificuldade in [1, 2, 3]:
+                    # A aposta mínima do nível precisa caber no saldo
+                    aposta_minima = {1: 10, 2: 50, 3: 100}[dificuldade]
+                    if aposta_minima > self.current_user['dinheiro']:
+                        print(f" Saldo insuficiente para este nível (aposta mínima R$ {aposta_minima:.2f}). Escolha um nível mais fácil.")
+                        continue
                     break
                 else:
                     print(" Opção inválida! Escolha 1, 2 ou 3.")
@@ -307,7 +319,10 @@ class BlackJackGame:
             if opcao == '1':
                 if not self.current_user or self.current_user['dinheiro'] <= 0:
                     nome = input("\n Digite seu nome de usuário: ").strip()
-                    if nome:
+                    # O caractere | separa os campos em blackjack_users.txt
+                    if '|' in nome:
+                        print(" O nome não pode conter o caractere '|'.")
+                    elif nome:
                         self.get_or_create_user(nome)
                 
                 if self.current_user and self.current_user['dinheiro'] > 0:
