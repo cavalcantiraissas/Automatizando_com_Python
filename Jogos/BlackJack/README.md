@@ -1,187 +1,93 @@
-# BlackJack em Python
+# BlackJack
 
-## Sobre o projeto
+**Vinte e um contra o dealer no terminal, com saldo virtual por jogador, três níveis de aposta e ranking persistente.**
 
-Este projeto consiste na implementação de um jogo de BlackJack desenvolvido em Python para execução via terminal. O sistema permite que jogadores criem contas, realizem apostas com saldo virtual, disputem partidas contra o dealer e acompanhem seu desempenho por meio de estatísticas e ranking.
+[![Python](https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![POO](https://img.shields.io/badge/paradigma-orientado_a_objetos-555555)](#estrutura-do-projeto)
+[![Jogos](https://img.shields.io/badge/cole%C3%A7%C3%A3o-Jogos-6f42c1)](../)
 
-O projeto foi desenvolvido utilizando conceitos de Programação Orientada a Objetos (POO), manipulação de arquivos, controle de fluxo, validação de dados e geração de números aleatórios.
-
----
-
-## Objetivos
-
-O projeto tem como finalidade aplicar conceitos fundamentais de desenvolvimento de software, incluindo:
-
-- Programação Orientada a Objetos;
-- Manipulação de arquivos para persistência de dados;
-- Controle de estados do jogo;
-- Validação de entradas do usuário;
-- Estruturas de dados nativas do Python;
-- Implementação da lógica do jogo BlackJack.
+Cada jogador novo começa com R$ 1.000,00 de saldo virtual. O objetivo é somar mais pontos que o dealer sem passar de 21; o saldo, as vitórias e as derrotas ficam salvos entre execuções.
 
 ---
 
-## Funcionalidades
+## Sumário
 
-- Cadastro automático de novos jogadores;
-- Sistema de login com carregamento de dados existentes;
-- Saldo inicial virtual para novos usuários;
-- Sistema de apostas baseado em níveis de dificuldade;
-- Controle de vitórias e derrotas;
-- Atualização automática do saldo do jogador;
-- Ranking de jogadores;
-- Armazenamento permanente dos dados em arquivo local;
-- Cálculo automático do valor das cartas, incluindo a regra especial do Ás;
-- Interface interativa por linha de comando.
+- [Regras](#regras)
+- [Destaques](#destaques)
+- [Como funciona](#como-funciona)
+- [Como executar](#como-executar)
+- [Estrutura do projeto](#estrutura-do-projeto)
+- [Limitações](#limitações)
 
 ---
 
-## Regras do jogo
-
-O objetivo do BlackJack é alcançar uma pontuação igual ou mais próxima de 21 pontos sem ultrapassar esse valor.
-
-Valores das cartas:
+## Regras
 
 | Carta | Valor |
-| :--- | :--- |
-| 2 a 10 | Valor numérico |
-| J, Q e K | 10 pontos |
-| Ás | 1 ou 11 pontos, conforme a melhor jogada |
+|---|---|
+| 2 a 10 | Valor nominal |
+| J, Q, K | 10 |
+| Ás | 11, ou 1 se a mão passar de 21 |
 
-O jogador pode realizar duas ações durante sua rodada:
+O jogador compra cartas (`C`) ou para (`P`). Depois, o dealer revela a carta escondida e compra até somar pelo menos 17. Ganha quem tiver mais pontos sem estourar; se o dealer estourar, o jogador ganha. Vitória soma a aposta ao saldo, derrota subtrai, e empate devolve a aposta.
 
-- Comprar uma nova carta;
-- Encerrar sua jogada e manter sua pontuação atual.
-
-Após o turno do jogador, o dealer realiza suas jogadas automaticamente seguindo as regras definidas pelo sistema.
-
----
-
-## Níveis de dificuldade
-
-O jogo possui três níveis de dificuldade que definem os limites das apostas:
-
-| Dificuldade | Valor mínimo | Valor máximo |
-| :--- | :---: | :---: |
+| Nível | Aposta mínima | Aposta máxima |
+|---|---|---|
 | Fácil | R$ 10,00 | R$ 100,00 |
 | Médio | R$ 50,00 | R$ 300,00 |
 | Difícil | R$ 100,00 | R$ 500,00 |
 
----
+A aposta máxima também é limitada pelo saldo. Um nível cuja aposta mínima passa do saldo não pode ser escolhido, e com menos de R$ 10,00 o jogador está fora: é preciso criar outro usuário.
 
-## Tecnologias utilizadas
+## Destaques
 
-- Python 3;
-- Biblioteca `random` para sorteio das cartas;
-- Biblioteca `os` para manipulação de arquivos e comandos do sistema operacional;
-- Biblioteca `datetime` para registro da data de criação dos usuários.
+- **Ás flexível:** `calcular_valor_mao` conta cada Ás como 11 e desconta 10 por Ás enquanto a mão passar de 21.
+- **Carta do dealer escondida** até o fim do turno do jogador.
+- **Ranking** dos 10 jogadores com mais vitórias, com saldo e estatísticas globais (partidas e taxa de vitória geral).
+- **Fim de jogo por falência:** ao zerar o saldo, a conta deixa de poder jogar.
 
----
+## Como funciona
+
+```mermaid
+flowchart LR
+    U[Usuário<br/>novo: R$ 1.000] --> N[Nível e aposta]
+    N --> J[Turno do jogador<br/>comprar ou parar]
+    J -->|passou de 21| P[Derrota]
+    J -->|parou| D[Dealer compra<br/>até 17]
+    D --> C{Comparação}
+    C --> V[Vitória] & P & E[Empate]
+    V & P --> A[(blackjack_users.txt)]
+```
+
+Os jogadores ficam em `blackjack_users.txt`, com cabeçalho e uma linha `NOME|VITORIAS|DERROTAS|DINHEIRO|DATA_CRIACAO` por jogador. O arquivo é relido e regravado a cada partida, de modo que o saldo nunca fica só na memória.
+
+## Como executar
+
+```bash
+cd Jogos/BlackJack
+python3 main.py
+```
+
+```text
+1️   INICIAR PARTIDA
+2️   VER RANKING
+3️   SAIR DO JOGO
+```
 
 ## Estrutura do projeto
 
-```text
-blackjack/
-│
-├── main.py
-├── blackjack_users.txt
-└── README.md
-```
+| Arquivo | Descrição |
+|---|---|
+| `main.py` | Classe `BlackJackGame`: contas, apostas, partida e ranking |
+| `blackjack_users.txt` | Gerado no uso: jogadores, estatísticas e saldo |
 
-Descrição dos arquivos:
+## Limitações
 
-- `main.py`: contém toda a lógica do jogo, regras, menus e gerenciamento dos jogadores;
-- `blackjack_users.txt`: arquivo utilizado para armazenar as informações dos usuários;
-- `README.md`: documentação do projeto.
+- Baralho infinito: cada carta é sorteada com reposição, então as probabilidades não mudam ao longo da mão.
+- Sem *split*, *double down*, seguro, nem pagamento 3:2 para o blackjack natural.
+- O empate não conta como vitória nem como derrota nas estatísticas.
+- Os nomes não podem conter `|`, o separador do arquivo.
 
 ---
 
-## Pré-requisitos
-
-Para executar o projeto é necessário possuir:
-
-- Python 3 instalado na máquina.
-
-Verifique a instalação utilizando:
-
-```bash
-python --version
-```
-
-ou:
-
-```bash
-python3 --version
-```
-
----
-
-## Instalação
-
-1. Clone o repositório:
-
-2. Acesse a pasta do projeto:
-
-
-Não é necessário instalar dependências externas, pois o projeto utiliza apenas módulos nativos da biblioteca padrão do Python.
-
----
-
-## Execução
-
-### Windows
-
-Execute o comando no Prompt de Comando ou PowerShell:
-
-```powershell
-python main.py
-```
-
-### Linux
-
-Execute o comando no terminal:
-
-```bash
-python3 main.py
-```
-
-### macOS
-
-Execute o comando no Terminal:
-
-```bash
-python3 main.py
-```
-
----
-
-## Persistência dos dados
-
-As informações dos jogadores são armazenadas no arquivo `blackjack_users.txt`.
-
-Cada registro contém:
-
-- Nome do usuário;
-- Quantidade de vitórias;
-- Quantidade de derrotas;
-- Saldo disponível;
-- Data de criação da conta.
-
-Os dados são carregados automaticamente ao iniciar o programa e atualizados ao final de cada partida.
-
----
-
-## Fluxo de funcionamento
-
-1. O usuário inicia o programa;
-2. Um novo jogador pode ser criado ou um usuário existente pode ser carregado;
-3. O jogador escolhe a dificuldade da partida;
-4. Uma aposta é realizada dentro dos limites permitidos;
-5. As cartas são distribuídas para o jogador e para o dealer;
-6. O jogador decide comprar novas cartas ou encerrar sua rodada;
-7. O dealer executa sua estratégia automaticamente;
-8. O sistema determina o vencedor;
-9. O saldo e as estatísticas são atualizados;
-10. O ranking pode ser consultado a qualquer momento.
-
----
+[← Jogos](../) · [Repositório principal](../../)
