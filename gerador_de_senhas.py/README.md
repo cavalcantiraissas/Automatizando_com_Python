@@ -1,89 +1,78 @@
-#  Gerador de Senhas Seguras com Cofre Criptografado
+# Gerador de senhas com cofre criptografado
 
-[![Licença MIT](https://img.shields.io/badge/Licen%C3%A7a-MIT-blue.svg)](LICENSE)
-[![Python 3.6+](https://img.shields.io/badge/Python-3.6%2B-green.svg)](https://www.python.org/)
+**Gera senhas fortes com o módulo `secrets` e as guarda num cofre local criptografado com Fernet, cuja chave é derivada de uma palavra-chave mestra por PBKDF2.**
 
-##  Sobre o projeto
+[![Python](https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![cryptography](https://img.shields.io/badge/cryptography-Fernet-555555)](https://cryptography.io/)
+[![KDF](https://img.shields.io/badge/KDF-PBKDF2--SHA256_100k-555555)](#como-funciona)
+[![Coleção](https://img.shields.io/badge/cole%C3%A7%C3%A3o-Automatizando_com_Python-6f42c1)](../)
 
-Este programa é uma solução prática e segura para **gerar senhas fortes** e **armazená-las de forma criptografada** em um único arquivo `.txt`.  
-Ele resolve o problema comum de criar senhas fáceis de lembrar, mas frágeis, e de armazená‑las de maneira insegura (bloco de notas, planilhas sem proteção).
-
-O projeto foi desenvolvido como parte de estudos do livro *Automatize Tarefas Chatos com Python* (Al Sweigart) e tem **foco educacional**, demonstrando:
-
-- Uso de expressões regulares (`regex`) para validação de força de senha.
-- Geração criptograficamente segura com o módulo `secrets`.
-- Criptografia simétrica (Fernet) e derivação de chave com PBKDF2.
-- Persistência de dados com JSON e arquivos binários.
+Uma alternativa a guardar senhas num bloco de notas ou numa planilha sem proteção. Projeto de estudo inspirado em *Automate the Boring Stuff with Python* (Al Sweigart), cobrindo expressões regulares, aleatoriedade criptográfica, criptografia simétrica e derivação de chave.
 
 ---
 
-##  Funcionalidades
+## Sumário
 
-| Função                        | Descrição                                                                 |
-|-------------------------------|---------------------------------------------------------------------------|
-| **Geração de senha forte**     | Mínimo 8 caracteres, incluindo maiúsculas, minúsculas e dígitos.         |
-| **Validação com regex**        | Verifica os critérios de segurança usando padrões `re`.                   |
-| **Cofre criptografado**        | Arquivo `senhas_criptografadas.txt` protegido por palavra‑chave mestra.   |
-| **Consulta de senhas**         | Lista todas as entradas (site + senha) após autenticação.                 |
-| **Substituição/Atualização**   | Mesmo site: a senha antiga é sobrescrita pela nova.                       |
-| **Portabilidade**              | Funciona em Windows, macOS e Linux (desde que Python 3.6+ esteja instalado). |
+- [Destaques](#destaques)
+- [Como funciona](#como-funciona)
+- [Como executar](#como-executar)
+- [Estrutura do projeto](#estrutura-do-projeto)
+- [Limitações](#limitações)
 
 ---
 
-##  Tecnologias e ferramentas utilizadas
+## Destaques
 
-- **Python 3.12** (linguagem principal)
-- **Bibliotecas padrão**:
-  - `re` → validação com regex
-  - `secrets` → geração de números aleatórios criptograficamente seguros
-  - `json` → serialização dos dados
-  - `os`, `base64`, `hashlib`, `string`
-- **Biblioteca externa**:
-  - [`cryptography`](https://cryptography.io/) → fornece o esquema Fernet (AES‑128 em modo CBC) e a derivação PBKDF2HMAC.
+- **Senhas fortes:** no mínimo 8 caracteres, com ao menos uma maiúscula, uma minúscula e um dígito, conferidos por regex.
+- **Aleatoriedade criptográfica:** `secrets.choice` e `secrets.SystemRandom().shuffle`, nunca o módulo `random`.
+- **Cofre criptografado:** o arquivo guarda só o *salt* e o texto cifrado; sem a palavra-chave, não revela nada.
+- **Palavra-chave nunca gravada:** a chave é derivada dela a cada execução.
+- **Atualização por site:** gerar de novo para um site já existente substitui a senha antiga.
+
+## Como funciona
+
+```mermaid
+flowchart LR
+    P[Palavra-chave] --> K[PBKDF2-HMAC-SHA256<br/>100.000 iterações]
+    S[salt aleatório<br/>16 bytes] --> K
+    K -->|chave de 32 bytes| F[Fernet]
+    J[JSON<br/>site → senha] --> F
+    F --> A[(senhas_criptografadas.txt<br/>salt + token)]
+```
+
+O cofre é um dicionário `{site: senha}` serializado em JSON. A cada gravação, um novo *salt* é sorteado, a chave é derivada e o JSON é cifrado com Fernet (AES-128 em modo CBC com autenticação HMAC-SHA256). Na leitura, os 16 primeiros bytes do arquivo são o *salt*; uma palavra-chave errada faz a verificação do HMAC falhar (`InvalidToken`) e o programa encerra sem tocar no arquivo.
+
+## Como executar
+
+```bash
+cd gerador_de_senhas.py
+pip install -r requirements.txt
+python3 gerador_de_senhas.py
+```
+
+Na primeira execução, a palavra-chave digitada cria o cofre; nas seguintes, a mesma palavra-chave é exigida.
+
+```text
+1 - Gerar nova senha para um site/aplicação
+2 - Listar todas as senhas armazenadas
+3 - Sair
+```
+
+## Estrutura do projeto
+
+| Arquivo | Descrição |
+|---|---|
+| `gerador_de_senhas.py` | Geração, validação, criptografia e menu |
+| `requirements.txt` | Dependência externa (`cryptography`) |
+| `senhas_criptografadas.txt` | Gerado no uso: *salt* + dados cifrados (binário, apesar da extensão) |
+
+## Limitações
+
+- Não há como recuperar a palavra-chave: esquecê-la significa perder o cofre.
+- As senhas geradas usam só letras e dígitos, sem símbolos.
+- As senhas aparecem em texto puro no terminal ao serem geradas e listadas.
+- Não é possível excluir uma entrada nem trocar a palavra-chave pelo menu.
 
 ---
 
-##  Como clonar e executar
-
-### 1. Clonar o repositório
- 
-### 2. Criar um ambiente virtual
-
-Windows(PowerSheell)
-```bash
-python -m venv venv
-.\venv\Scripts\activate
-```
-MacOS/Linux
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-### 3. Instalar a dependência
-```bash
-pip install cryptography
-```
-### 4. Executar o programa
-```bash
-python gerador_de_senhas.py
-```
-> Nota: Em alguns sistemas, o comando pode ser python3 em vez de python.
-
-## Estrutura de Segurança
-
-- A palavra‑chave mestra nunca é armazenada em texto puro.
-- A chave de criptografia é derivada com PBKDF2 (100.000 iterações, SHA‑256) e um salt aleatório de 16 bytes.
-- O arquivo senhas_criptografadas.txt contém salt + ciphertext – mesmo aberto, não revela as senhas.
-- A descriptografia só ocorre após fornecimento da palavra‑chave correta no momento da execução.
-
-> Contribuições são bem‑vindas! Abra uma issue ou um pull request.
-
-## Autora
-
-Raissa Cavalcanti
-- [Github](https://github.com/cavalcantiraissas)
-- [Linkedin]([https://www.linkedin.com/in/cavalcantiraissa/)
-- E‑mail: Cavalcanti.c.raissa@gmail.com
-
-
+[← Automatizando com Python](../)
