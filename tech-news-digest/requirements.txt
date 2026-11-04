@@ -1,0 +1,5 @@
+requests
+feedparser
+python-dotenv
+# Opcional: só é usado com USAR_IA = True
+google-generativeai
