@@ -18,6 +18,10 @@ def adicionar_evento():
     if not titulo:
         print("Título não pode ficar vazio.")
         return
+    # O ';' separa os campos em eventos.txt
+    if ";" in titulo:
+        print("Título não pode conter ';'.")
+        return
 
     data_atual = input("Data atual (dd/mm/aaaa): ").strip()
     if not validar_data(data_atual):
