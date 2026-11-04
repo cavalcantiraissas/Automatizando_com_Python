@@ -122,7 +122,8 @@ def jogar():
     print("="*50)
     
     # Solicitar nome do usuário
-    user = input("Digite seu nome de usuário: ").strip()
+    # O caractere | separa os campos em ranking_jogo.txt
+    user = input("Digite seu nome de usuário: ").strip().replace('|', '')
     if not user:
         print("Nome inválido! Usando 'Anônimo'.")
         user = "Anônimo"
